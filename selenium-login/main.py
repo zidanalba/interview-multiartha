@@ -30,8 +30,16 @@ def login_shopee(driver, username, password):
         ActionChains(driver).move_to_element(login_button).click().perform()
         print("Clicked login button.")
 
-        wait.until(EC.url_contains("user")) 
-        print("Logged in successfully")
+        wait.until(EC.url_contains("user"))
+
+        if "user" in driver.current_url:
+            print("Login successful.")
+        else:
+            try:
+                error_message = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".HyEuQL")))
+                print("Login failed: "+error_message)
+            except:
+                print("Unknown error occurred during login.")
     except Exception as e:
         logging.error("Error during login:", exc_info=True)
         print("Error during login:", e)
@@ -45,8 +53,19 @@ if __name__ == "__main__":
 
     # Setup WebDriver
     driver_path = os.path.abspath("edgedriver_win64/msedgedriver.exe")
+
+    user_data_dir = r"C:\Users\Hp\AppData\Local\Microsoft\Edge\User Data"
+    profile_directory = "Default"
+    options = webdriver.EdgeOptions()
+    options.add_argument(f"--user-data-dir={user_data_dir}")
+    options.add_argument(f"--profile-directory={profile_directory}")
+    options.add_argument("--disable-blink-features=AutomationControlled")  # Helps avoid detection
+    options.add_argument("--no-sandbox")  # Disable sandboxing
+    options.add_argument("--disable-gpu")  # Disable GPU hardware acceleration
+    options.add_argument("--remote-debugging-port=9222")  # Set remote debugging port
+
     service = Service(executable_path=driver_path)
-    driver = webdriver.Edge(service=service)
+    driver = webdriver.Edge(service=service, options=options)
 
     # Open the login page
     driver.get(url)

@@ -1,0 +1,9 @@
+selenium
+flask
+flask-security
+flask-wtf
+flask_sqlalchemy
+flask_cors
+psycopg2-binary
+flask_migrate
+Flask-Seeder
