@@ -8,3 +8,5 @@ psycopg2-binary
 flask_migrate
 Flask-Seeder
 flask_restx
+werkzeug
+flask_jwt_extended
