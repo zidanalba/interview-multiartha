@@ -7,3 +7,4 @@ flask_cors
 psycopg2-binary
 flask_migrate
 Flask-Seeder
+flask_restx

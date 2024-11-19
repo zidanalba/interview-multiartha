@@ -7,3 +7,4 @@ from .attachment import Attachment
 from .chat import Chat
 from .message import Message
 from .activity_logs import ActivityLog
+from .token_blacklists import TokenBlacklist
