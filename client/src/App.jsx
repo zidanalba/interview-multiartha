@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
@@ -7,6 +8,7 @@ import UserActivityPage from "./pages/UserActivityPage";
 import UserPage from "./pages/UserPage";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
       {/* BG */}
@@ -17,9 +19,9 @@ function App() {
       {/* BG */}
       <Sidebar />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/user" element={<UserPage />} />
-        <Route path="/user-log" element={<UserActivityPage />} />
+        <Route path="/login" element={<LoginPage isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/user" element={<UserPage isAuthenticated={isAuthenticated} />} />
+        <Route path="/user-log" element={<UserActivityPage isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />} />
       </Routes>
     </div>
   );

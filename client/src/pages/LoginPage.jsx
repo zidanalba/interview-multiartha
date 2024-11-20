@@ -4,13 +4,14 @@ import Header from "../components/Header";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
-const LoginPage = () => {
+const LoginPage = (isAuthenticated, setIsAuthenticated) => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const getRolesFromToken = (token) => {
     if (!token) return [];
@@ -24,28 +25,30 @@ const LoginPage = () => {
   };
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
+      setErrorMessage("");
       const response = await axios.post("http://127.0.0.1:5000/auth/login", { email, password });
-
       const { data } = response;
 
       if (data.access_token) {
         setSuccessMessage("Login successful! Redirecting...");
+        setErrorMessage("");
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("refresh_token", data.refresh_token);
 
         const roles = getRolesFromToken(data.access_token);
-        console.log(roles);
-        if (roles.includes("Admin")) {
-          navigate("/user");
-        } else {
-          navigate("/unauthorized");
-        }
+        setIsAuthenticated(true);
+        roles.includes("Admin") ? navigate("/user") : navigate("/unauthorized");
       } else {
         setErrorMessage(data.message || "Login failed");
+        setSuccessMessage("");
       }
     } catch (error) {
-      setErrorMessage("Login gagal: Email atau Password tidak sesuai");
+      setErrorMessage("Login failed: Wrong Email or Password.");
+      setSuccessMessage("");
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -88,8 +91,8 @@ const LoginPage = () => {
                 />
               </div>
               <div className="flex items-center justify-between mb-4">
-                <button type="submit" className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 px-5 w-full sm:w-auto">
-                  Submit
+                <button type="submit" className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 px-5 w-full sm:w-auto" disabled={loading}>
+                  {loading ? "Loading..." : "Submit"}
                 </button>
                 <div className="flex items-center text-sm">
                   <p>New here?</p>

@@ -98,10 +98,9 @@ class UsersResource(Resource):
         """Get all users with pagination and filters"""
         current_user = json.loads(get_jwt_identity())
         print(current_user)
-        sys.stdout.flush()
         user_roles = current_user.get('roles', [])
 
-        if 'admin' not in user_roles:
+        if 'Admin' not in user_roles:
             return {"message": "Access denied. Admins only."}, 403
 
         args = pagination_parser.parse_args()
