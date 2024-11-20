@@ -6,8 +6,9 @@ class ActivityLog(db.Model):
 
     id = db.Column(db.String(36), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    activity_type = db.Column(db.String(255), nullable=False)  # Type of activity
-    description = db.Column(db.Text, nullable=True)  # Additional details
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    activity = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45), nullable=True)
+    user_agent = db.Column(db.Text, nullable=True)
 
     user = db.relationship('User', backref='activity_logs')
