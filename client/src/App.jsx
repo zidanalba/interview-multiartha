@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import { AlertCustomStyles } from "./components/AlertCustomStyles";
 
 import Sidebar from "./components/Sidebar";
 
@@ -9,6 +10,11 @@ import UserPage from "./pages/UserPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const handleShowAlert = () => {
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
       {/* BG */}
@@ -19,9 +25,9 @@ function App() {
       {/* BG */}
       <Sidebar />
       <Routes>
-        <Route path="/login" element={<LoginPage isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/user" element={<UserPage isAuthenticated={isAuthenticated} />} />
-        <Route path="/user-log" element={<UserActivityPage isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/login" element={<LoginPage isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} handleShowAlert={handleShowAlert} />} />
+        <Route path="/user" element={<UserPage isAuthenticated={isAuthenticated} handleShowAlert={handleShowAlert} />} />
+        <Route path="/user-log" element={<UserActivityPage isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} handleShowAlert={handleShowAlert} />} />
       </Routes>
     </div>
   );

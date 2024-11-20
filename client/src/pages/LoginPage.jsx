@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { getRolesFromToken } from "../utils";
+import { AlertCustomStyles } from "../components/AlertCustomStyles";
 
-const LoginPage = (isAuthenticated, setIsAuthenticated) => {
+const LoginPage = ({ isAuthenticated, setIsAuthenticated }) => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -12,17 +13,6 @@ const LoginPage = (isAuthenticated, setIsAuthenticated) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const getRolesFromToken = (token) => {
-    if (!token) return [];
-    try {
-      const decodedToken = jwtDecode(token);
-      const sub = typeof decodedToken.sub === "string" ? JSON.parse(decodedToken.sub) : decodedToken.sub;
-      return sub.roles || [];
-    } catch (error) {
-      return [];
-    }
-  };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -51,9 +41,17 @@ const LoginPage = (isAuthenticated, setIsAuthenticated) => {
       setLoading(false);
     }
   };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    navigate("/login");
+  };
+
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Login" />
+      <Header title="Login" isAuthenticated={isAuthenticated} />
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8 xl:px-20">
         <div className="flex justify-center">
           <div className="w-96 backdrop-blur-lg bg-opacity-80 rounded-lg shadow-lg p-5 bg-gray-900 text-white">
@@ -61,7 +59,7 @@ const LoginPage = (isAuthenticated, setIsAuthenticated) => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleLogin();
+                if (!isAuthenticated) handleLogin();
               }}
             >
               {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>} {/* Success message */}
@@ -71,11 +69,12 @@ const LoginPage = (isAuthenticated, setIsAuthenticated) => {
                 <input
                   type="email"
                   id="email"
-                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
+                  className={`${isAuthenticated ? "bg-gray-300" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4`}
                   placeholder="andrew@mail.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isAuthenticated}
                 />
               </div>
               <div className="mb-4">
@@ -83,21 +82,29 @@ const LoginPage = (isAuthenticated, setIsAuthenticated) => {
                 <input
                   type="password"
                   id="password"
-                  className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
+                  className={`${isAuthenticated ? "bg-gray-300" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4`}
                   placeholder="*********"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isAuthenticated}
                 />
               </div>
               <div className="flex items-center justify-between mb-4">
-                <button type="submit" className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 px-5 w-full sm:w-auto" disabled={loading}>
-                  {loading ? "Loading..." : "Submit"}
+                <button
+                  type="button"
+                  className={`text-white ${isAuthenticated ? "bg-red-600 hover:bg-red-700" : "bg-purple-600 hover:bg-purple-700"} focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 px-5 w-full sm:w-auto`}
+                  disabled={loading}
+                  onClick={isAuthenticated ? handleLogout : handleLogin}
+                >
+                  {loading ? "Loading..." : isAuthenticated ? "Log Out" : "Submit"}
                 </button>
-                <div className="flex items-center text-sm">
-                  <p>New here?</p>
-                  <p className="underline cursor-pointer ml-1">Register</p>
-                </div>
+                {!isAuthenticated && (
+                  <div className="flex items-center text-sm">
+                    <p>New here?</p>
+                    <p className="underline cursor-pointer ml-1">Register</p>
+                  </div>
+                )}
               </div>
             </form>
           </div>

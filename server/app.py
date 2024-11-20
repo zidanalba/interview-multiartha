@@ -19,7 +19,7 @@ def create_app():
     app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
 
     jwt = JWTManager(app)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
     db.init_app(app)
 
     api = Api(app, version='1.0', title='Commerceal API Documentation', 
