@@ -8,6 +8,7 @@ from exts import db
 from utils import generate_uuid
 import traceback
 import json
+import sys
 
 user_ns = Namespace("user", description="Namespace for managing users")
 
@@ -45,8 +46,6 @@ response_model = user_ns.model('Response', {
 pagination_parser = reqparse.RequestParser()
 pagination_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
 pagination_parser.add_argument('per_page', type=int, required=False, default=10, help='Users per page')
-pagination_parser.add_argument('search', type=str, required=False, help='Search term for email')
-pagination_parser.add_argument('role', type=str, action='append', required=False, help='Role filter')
 
 
 @user_ns.route('/')
@@ -98,25 +97,19 @@ class UsersResource(Resource):
     def get(self):
         """Get all users with pagination and filters"""
         current_user = json.loads(get_jwt_identity())
+        print(current_user)
+        sys.stdout.flush()
         user_roles = current_user.get('roles', [])
 
-        if 'Admin' not in user_roles:
+        if 'admin' not in user_roles:
             return {"message": "Access denied. Admins only."}, 403
 
         args = pagination_parser.parse_args()
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        search = args.get('search')
-        role_filters = args.get('role')
 
         try:
             query = User.query
-
-            if search:
-                query = query.filter(User.email.ilike(f'%{search}%'))
-
-            if role_filters:
-                query = query.filter(User.roles.any(Role.name.in_(role_filters)))
 
             pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 

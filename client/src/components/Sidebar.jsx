@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { Logs, Menu, MoveLeftIcon, Users } from "lucide-react";
+import { LogIn, Logs, Menu, MoveLeftIcon, Users } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const SIDEBAR_ITEMS = [
+  {
+    name: "Log In",
+    icon: LogIn,
+    color: "#6366f1",
+    path: "/login",
+  },
   {
     name: "User",
     icon: Users,

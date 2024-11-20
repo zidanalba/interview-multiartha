@@ -41,7 +41,7 @@ class LoginResource(Resource):
 
         roles = [role.name for role in user.roles]
         identity = {"email": user.email, "roles": roles}
-
+        print(identity)
         # Convert identity to a JSON string
         access_token = create_access_token(identity=json.dumps(identity))
         refresh_token = create_refresh_token(identity=json.dumps(identity))
