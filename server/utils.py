@@ -74,3 +74,4 @@ def handle_uploaded_file(file_data, field_name, organisasi):
     except Exception as e:
         traceback.print_exc()
         raise e
+

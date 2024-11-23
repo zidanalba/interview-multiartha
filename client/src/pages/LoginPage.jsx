@@ -4,8 +4,9 @@ import Header from "../components/Header";
 import axios from "axios";
 import { getRolesFromToken } from "../utils";
 import { AlertCustomStyles } from "../components/AlertCustomStyles";
+import { useAlert } from "../components/AlertContext";
 
-const LoginPage = ({ isAuthenticated, setIsAuthenticated }) => {
+const LoginPage = ({ isAuthenticated, setIsAuthenticated, handleLogout }) => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -40,13 +41,6 @@ const LoginPage = ({ isAuthenticated, setIsAuthenticated }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    navigate("/login");
   };
 
   return (

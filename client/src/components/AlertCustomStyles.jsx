@@ -20,7 +20,7 @@ export function AlertCustomStyles({ message, type }) {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-20 right-4 z-50">
       <Alert icon={<Icon />} className={`rounded-none border-l-4 ${typeStyles[type]} font-medium`}>
         {message}
       </Alert>

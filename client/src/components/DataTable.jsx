@@ -2,15 +2,6 @@ import React, { useState } from "react";
 import DataTable, { createTheme } from "react-data-table-component";
 import { AnimatePresence, motion } from "framer-motion";
 
-const data = [
-  { id: 1, name: "John Doe", email: "john@example.com", age: 32 },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", age: 27 },
-  { id: 3, name: "Bob Johnson", email: "bob@example.com", age: 45 },
-  { id: 4, name: "Alice Williams", email: "alice@example.com", age: 19 },
-  { id: 5, name: "Tom Davis", email: "tom@example.com", age: 35 },
-  { id: 6, name: "Sara Lee", email: "sara@example.com", age: 28 },
-];
-
 createTheme(
   "solarized",
   {
@@ -53,38 +44,60 @@ createTheme(
 
 const columns = [
   {
-    name: "ID",
-    selector: (row) => row.id,
+    name: "User ID",
+    selector: (row) => row.user_id,
     sortable: true,
   },
   {
-    name: "Name",
-    selector: (row) => row.name,
+    name: "Activity",
+    selector: (row) => row.activity,
     sortable: true,
   },
   {
-    name: "Email",
-    selector: (row) => row.email,
+    name: "Timestamp",
+    selector: (row) => row.timestamp,
     sortable: true,
   },
   {
-    name: "Age",
-    selector: (row) => row.age,
+    name: "IP Address",
+    selector: (row) => row.ip_address,
+    sortable: true,
+  },
+  {
+    name: "User Agent",
+    selector: (row) => row.user_agent,
     sortable: true,
   },
 ];
 
-const DataTableExample = () => {
+const DataTableExample = (data) => {
   const [filterText, setFilterText] = useState("");
 
-  const filteredData = data.filter((item) => item.name.toLowerCase().includes(filterText.toLowerCase()) || item.email.toLowerCase().includes(filterText.toLowerCase()));
+  const dataDummy = [
+    {
+      user_id: 1,
+      activity: "Successfully logged in",
+      timestamp: "2024-11-21 09:26:39.441",
+      ip_address: "127.0.0.1",
+      user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    },
+    { user_id: 2, activity: "Jane Smith", timestamp: "jane@example.com", ip_address: 27 },
+    { user_id: 3, activity: "Bob Johnson", timestamp: "bob@example.com", ip_address: 45 },
+    { user_id: 4, activity: "Alice Williams", timestamp: "alice@example.com", ip_address: 19 },
+    { user_id: 5, activity: "Tom Davis", timestamp: "tom@example.com", ip_address: 35 },
+    { user_id: 6, activity: "Sara Lee", timestamp: "sara@example.com", ip_address: 28 },
+  ];
+  console.log(data.data.data);
+  const log_data = data.data.data;
+
+  // console.log(data);
 
   return (
     <motion.div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100">Daftar Pengguna</h2>
       </div>
-      <DataTable columns={columns} theme="solarized" data={filteredData} pagination highlightOnHover pointerOnHover className="table-transparent rounded-lg shadow-md" />
+      <DataTable columns={columns} theme="solarized" data={log_data} pagination highlightOnHover pointerOnHover className="table-transparent rounded-lg shadow-md" />
     </motion.div>
   );
 };

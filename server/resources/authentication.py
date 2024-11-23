@@ -8,6 +8,7 @@ import traceback
 from datetime import timedelta
 from exts import db
 import json
+from logs import log_user_activity
 
 auth_ns = Namespace("auth", description="Namespace untuk Autentikasi")
 
@@ -32,15 +33,16 @@ class LoginResource(Resource):
     def post(self):
         """Login"""
         data = request.get_json()
-        
         user = User.query.filter_by(email=data['email']).first()
         if not user or not check_password_hash(user.password, data['password']):
             return {
                 "message": "Email atau password tidak sesuai",
             }, 401
 
+        log_user_activity(user.id, "Successfully logged in")
+
         roles = [role.name for role in user.roles]
-        identity = {"email": user.email, "roles": roles}
+        identity = {"id": user.id,"email": user.email, "roles": roles}
         print(identity)
         # Convert identity to a JSON string
         access_token = create_access_token(identity=json.dumps(identity))
@@ -59,6 +61,7 @@ class LogoutResource(Resource):
     @jwt_required()
     def post(self):
         """Logout"""
+        print(get_jwt())
         jti = get_jwt()['jti']
         try:
             blacklisted_token = TokenBlacklist(JTI=jti)

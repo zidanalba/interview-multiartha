@@ -7,7 +7,7 @@ import Modal from "../components/Modal";
 import ProductsTable from "../components/ProductsTable";
 import { isTokenExpired, refreshToken } from "../utils";
 
-const UserPage = (isAuthenticated) => {
+const UserPage = (isAuthenticated, handleLogout) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState([]); // Initialized as an empty array
@@ -184,7 +184,7 @@ const UserPage = (isAuthenticated) => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="User" isAuthenticated={isAuthenticated} />
+      <Header title="User" isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8 xl:px-20">
         <ProductsTable
           data={data}

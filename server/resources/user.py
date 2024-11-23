@@ -2,13 +2,14 @@ from flask_restx import Resource, fields, Namespace, reqparse
 from sqlalchemy.exc import SQLAlchemyError
 from flask import request
 from werkzeug.security import generate_password_hash
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models import User, Role
 from exts import db
 from utils import generate_uuid
 import traceback
 import json
 import sys
+from logs import log_user_activity
 
 user_ns = Namespace("user", description="Namespace for managing users")
 
@@ -61,7 +62,7 @@ class UsersResource(Resource):
 
         if 'Admin' not in user_roles:
             return {"message": "Access denied. Admins only."}, 403
-
+        print(current_user)
         data = request.get_json()
         try:
             new_user = User(
@@ -75,6 +76,7 @@ class UsersResource(Resource):
 
             db.session.add(new_user)
             db.session.commit()
+            log_user_activity(current_user['id'], f"Successfully created user {new_user.email} with id : {new_user.id}")
 
             return {
                 'message': 'User created successfully',
@@ -97,7 +99,6 @@ class UsersResource(Resource):
     def get(self):
         """Get all users with pagination and filters"""
         current_user = json.loads(get_jwt_identity())
-        print(current_user)
         user_roles = current_user.get('roles', [])
 
         if 'Admin' not in user_roles:
@@ -119,6 +120,7 @@ class UsersResource(Resource):
                     'roles': [role.name for role in user.roles],
                 } for user in pagination.items
             ]
+            log_user_activity(current_user['id'], f"Retrieved users data")
 
             return {
                 'message': 'Users retrieved successfully',
@@ -147,6 +149,8 @@ class UserResource(Resource):
             return {"message": "Access denied. Admins only."}, 403
         try:
             user = User.query.get_or_404(id)
+            log_user_activity(current_user['id'], f"Successfully retireved user {user.id} data")
+
             return {
                 'message': 'User retrieved successfully',
                 'data': {
@@ -164,6 +168,7 @@ class UserResource(Resource):
     @jwt_required()
     def put(self, id):
         """Update an existing user"""
+        print(get_jwt()['jti'])
         current_user = json.loads(get_jwt_identity())
         user_roles = current_user.get('roles', [])
 
@@ -182,7 +187,7 @@ class UserResource(Resource):
                 user.roles = roles
 
             db.session.commit()
-
+            log_user_activity(current_user['id'], f"Successfully updated user {user.id} data")
             return {
                 'message': 'User updated successfully',
                 'data': {
@@ -202,14 +207,18 @@ class UserResource(Resource):
         """Delete a user"""
         current_user = json.loads(get_jwt_identity())
         user_roles = current_user.get('roles', [])
-
+    
         if 'Admin' not in user_roles:
             return {"message": "Access denied. Admins only."}, 403
 
         try:
             user = User.query.get_or_404(id)
+            user_id_deleted = user.id
+            user_email_deleted = user.email
             db.session.delete(user)
             db.session.commit()
+            log_user_activity(current_user['id'], f"Successfully deleted {user_email_deleted} with id: {user_id_deleted}")
+
             return {'message': f'User with ID {id} deleted successfully'}, 200
         except Exception as e:
             db.session.rollback()
